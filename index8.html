@@ -40,9 +40,10 @@ const storage = firebase.storage();
 db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
 
 /* ══════════════════════════════════════════════════
-   CONFIGURACIÓN — Cambia el PIN aquí
+   CONFIGURACIÓN — Cambia los PINs aquí
 ══════════════════════════════════════════════════ */
-const APP_PIN = "202412";
+const APP_PIN = "202412";  // PIN global — todos lo necesitan para entrar
+const SEC_PIN = "111111";  // PIN de Secretaria — cámbialo por el que quieras (6 dígitos)
 
 /* ══════════════════════════════════════════════════
    CONSTANTES
@@ -140,7 +141,24 @@ button,input,select,textarea{font-family:inherit}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
 .pin-shake{animation:shake .4s ease}
 
-/* ── Loader ── */
+/* ── PIN Secretaria (segunda capa) ── */
+.sec-pin-wrap{min-height:100vh;background:linear-gradient(160deg,#1a0a2e 0%,#3d1060 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.sec-pin-badge{background:rgba(197,143,235,.15);border:1px solid rgba(197,143,235,.3);border-radius:20px;padding:10px 20px;font-size:12px;font-weight:700;color:var(--liz);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.sec-pin-title{font-family:'Playfair Display',serif;font-size:26px;color:#fff;font-weight:700;text-align:center;margin-bottom:4px}
+.sec-pin-sub{font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:32px}
+.sec-pin-dots-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:8px}
+.sec-pin-dots{display:flex;gap:14px}
+.sec-pin-dot{width:14px;height:14px;border-radius:50%;background:rgba(197,143,235,.25);transition:background .15s;border:1px solid rgba(197,143,235,.4)}
+.sec-pin-dot.filled{background:var(--liz);border-color:var(--liz);box-shadow:0 0 10px rgba(197,143,235,.5)}
+.sec-pin-err{font-size:13px;color:#f87171;font-weight:600;height:20px}
+.sec-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:252px;margin-top:18px}
+.sec-key-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:17px;font-size:22px;font-weight:600;color:#fff;cursor:pointer;transition:all .1s}
+.sec-key-btn:active{background:rgba(197,143,235,.25);transform:scale(.93)}
+.sec-key-btn.del{font-size:18px;color:rgba(255,255,255,.5)}
+.sec-key-btn.empty{visibility:hidden}
+.sec-pin-back{background:none;border:none;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;margin-top:28px;padding:8px 16px;font-family:inherit;display:flex;align-items:center;gap:5px}
+.sec-pin-back:hover{color:rgba(255,255,255,.7)}
+.sec-pin-lock{font-size:48px;margin-bottom:16px}
 .loader{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at 50% 0%,#edd6ff,var(--pale) 70%)}
 .loader-logo{height:56px;animation:breathe 2.5s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.95)}}
@@ -371,10 +389,125 @@ input:checked + .toggle-slider:before{transform:translateX(22px)}
 .empty-txt{color:var(--text3);font-size:14px;line-height:1.7}
 .fade{animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ MODO TV — Pantalla de producción para televisor ══ */
+.tv-wrap{position:fixed;inset:0;background:#080415;display:flex;flex-direction:column;overflow:hidden;font-family:'Inter',sans-serif;z-index:500}
+.tv-new-alert{position:absolute;top:0;left:0;right:0;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;padding:1.4vw;text-align:center;font-size:2.2vw;font-weight:900;z-index:100;animation:tvSlideDown .3s ease;letter-spacing:.5px}
+@keyframes tvSlideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.tv-hdr{background:var(--grad);padding:.9vw 2vw;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:0 4px 30px rgba(0,0,0,.5)}
+.tv-brand{display:flex;align-items:center;gap:1.2vw}
+.tv-logo{height:3vw;filter:brightness(0) invert(1)}
+.tv-hdr-name{font-family:'Playfair Display',serif;font-size:1.9vw;color:#fff;font-weight:700}
+.tv-hdr-sub{font-size:.8vw;color:rgba(255,255,255,.6);margin-top:.1vw;text-transform:uppercase;letter-spacing:1px}
+.tv-clock{font-family:'Playfair Display',serif;font-size:4.2vw;color:#fff;font-weight:700;letter-spacing:.05em;text-shadow:0 0 40px rgba(197,143,235,.6);line-height:1}
+.tv-stats-bar{background:rgba(255,255,255,.05);padding:.55vw 2vw;display:flex;align-items:center;gap:2.5vw;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.07)}
+.tv-stat-item{display:flex;align-items:center;gap:.5vw;font-size:.95vw}
+.tv-stat-dot{width:.85vw;height:.85vw;border-radius:50%;flex-shrink:0}
+.tv-stat-lbl{color:rgba(255,255,255,.5);font-weight:500}
+.tv-stat-n{color:#fff;font-weight:800;font-size:1.25vw;margin-left:.15vw}
+.tv-pager{margin-left:auto;display:flex;align-items:center;gap:.5vw}
+.tv-pager-dot{width:.55vw;height:.55vw;border-radius:50%;background:rgba(255,255,255,.2);transition:background .4s}
+.tv-pager-dot.on{background:var(--liz)}
+.tv-grid{flex:1;display:grid;gap:1vw;padding:1vw 1.8vw;overflow:hidden;align-content:start}
+.tv-g-1{grid-template-columns:1fr;max-width:35vw;margin:0 auto;width:100%}
+.tv-g-2{grid-template-columns:1fr 1fr}
+.tv-g-3,.tv-g-4,.tv-g-5,.tv-g-6{grid-template-columns:repeat(3,1fr)}
+.tv-card{background:rgba(255,255,255,.05);border-radius:.9vw;padding:1.2vw 1.4vw;border:1px solid rgba(255,255,255,.09);position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.45vw}
+.tv-card.tv-urg{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.07);animation:tvUrgPulse 2.5s ease-in-out infinite}
+@keyframes tvUrgPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 0 .4vw rgba(239,68,68,.15)}}
+.tv-card.tv-listo{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.06)}
+.tv-card.tv-en_camino{border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.05)}
+.tv-status-strip{position:absolute;top:0;left:0;right:0;height:.28vw}
+.tv-card-head{display:flex;justify-content:space-between;align-items:center;margin-top:.15vw}
+.tv-badge{display:inline-flex;align-items:center;gap:.4vw;padding:.3vw .85vw;border-radius:2vw;font-size:.72vw;font-weight:800;letter-spacing:.3px}
+.tv-urg-pill{background:#dc2626;color:#fff;font-size:.68vw;font-weight:900;padding:.28vw .75vw;border-radius:.7vw;animation:tvUrgPulse 1.2s ease-in-out infinite}
+.tv-prod-name{font-size:1.4vw;font-weight:800;color:#fff;line-height:1.2}
+.tv-card-info{display:grid;grid-template-columns:1fr 1fr;gap:.28vw .7vw}
+.tv-info-row{font-size:.82vw;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:.3vw}
+.tv-info-row strong{color:rgba(255,255,255,.9);font-weight:700}
+.tv-note-tv{font-size:.75vw;color:rgba(255,255,255,.42);font-style:italic;background:rgba(255,255,255,.04);padding:.38vw .7vw;border-radius:.5vw}
+.tv-timer{display:inline-flex;align-items:center;gap:.4vw;font-size:.82vw;font-weight:700;padding:.32vw .75vw;border-radius:.55vw;width:fit-content;margin-top:.1vw}
+.tv-timer.running{color:#f59e0b;background:rgba(245,158,11,.12)}
+.tv-timer.done{color:#22c55e;background:rgba(34,197,94,.12)}
+.tv-done-bar{background:rgba(34,197,94,.07);border-top:1px solid rgba(34,197,94,.14);padding:.55vw 2vw;display:flex;align-items:center;gap:1.2vw;flex-shrink:0;overflow:hidden}
+.tv-done-lbl{font-size:.82vw;color:#22c55e;font-weight:700;white-space:nowrap;flex-shrink:0}
+.tv-done-item{font-size:.78vw;color:rgba(255,255,255,.55);background:rgba(34,197,94,.09);padding:.24vw .7vw;border-radius:.5vw;white-space:nowrap;flex-shrink:0}
+.tv-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5vw}
+.tv-empty-ic{font-size:7vw}
+.tv-empty-txt{font-size:1.8vw;color:rgba(255,255,255,.3);font-weight:600}
+.tv-exit-btn{position:fixed;bottom:.7vw;right:.7vw;background:rgba(255,255,255,.05);color:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.08);border-radius:.5vw;padding:.4vw .85vw;font-size:.75vw;cursor:pointer;font-family:inherit;z-index:200}
+.tv-exit-btn:active{background:rgba(255,255,255,.15);color:#fff}
+.role-btn.tv{border-color:#1d4ed8;background:rgba(219,234,254,.9)}
+.role-name.tv{color:#1e40af}
 `;
 
+
 /* ══════════════════════════════════════════════════
-   PIN
+   PIN DE SECRETARIA — Segunda capa de seguridad
+   Solo aparece cuando alguien elige el rol Secretaria
+══════════════════════════════════════════════════ */
+function SecPINScreen({ onSuccess, onBack }) {
+  const [pin, setPin]   = React.useState("");
+  const [err, setErr]   = React.useState(false);
+  const [shk, setShk]   = React.useState(false);
+  const [tries, setTries] = React.useState(0);
+
+  const add = d => {
+    if (pin.length >= 6) return;
+    const np = pin + d;
+    setPin(np);
+    if (np.length === 6) {
+      setTimeout(() => {
+        if (np === SEC_PIN) {
+          sessionStorage.setItem("liz-sec-ok", "1");
+          onSuccess();
+        } else {
+          const t = tries + 1;
+          setTries(t);
+          setErr(true); setShk(true); setPin("");
+          setTimeout(() => { setErr(false); setShk(false); }, 1600);
+        }
+      }, 200);
+    }
+  };
+  const del = () => setPin(p => p.slice(0, -1));
+
+  return (
+    <div className="sec-pin-wrap">
+      <div className="sec-pin-lock">🔐</div>
+      <div className="sec-pin-badge">Acceso Administración</div>
+      <div className="sec-pin-title">Floristería Liz</div>
+      <div className="sec-pin-sub">Ingresa el PIN de Secretaria</div>
+
+      <div className="sec-pin-dots-wrap">
+        <div className={"sec-pin-dots" + (shk ? " pin-shake" : "")}>
+          {[0,1,2,3,4,5].map(i => (
+            <div key={i} className={"sec-pin-dot" + (pin.length > i ? " filled" : "")} />
+          ))}
+        </div>
+        <div className="sec-pin-err">
+          {err ? `PIN incorrecto${tries >= 3 ? " — Habla con la administración" : ""}` : ""}
+        </div>
+      </div>
+
+      <div className="sec-keypad">
+        {[1,2,3,4,5,6,7,8,9].map(k => (
+          <button key={k} type="button" className="sec-key-btn" onClick={() => add(k + "")}>{k}</button>
+        ))}
+        <button type="button" className="sec-key-btn empty" disabled></button>
+        <button type="button" className="sec-key-btn" onClick={() => add("0")}>0</button>
+        <button type="button" className="sec-key-btn del" onClick={del}>⌫</button>
+      </div>
+
+      <button type="button" className="sec-pin-back" onClick={onBack}>
+        ← Volver al selector de rol
+      </button>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   PIN GLOBAL
 ══════════════════════════════════════════════════ */
 function PINScreen({ onSuccess }) {
   const [pin,setPin]=React.useState(""); const [err,setErr]=React.useState(false); const [shk,setShk]=React.useState(false);
@@ -445,12 +578,20 @@ function RoleSel({ onSel }) {
           <span className="role-ic">{r.ic}</span><div><div className="role-name">{r.name}</div><div className="role-desc">{r.desc}</div></div>
         </button>
       ))}
-      {/* MEJORA 3: Botón especial para Modo Kiosko */}
+      {/* Modo Kiosko — tablet del taller */}
       <button type="button" className="role-btn kiosko" onClick={()=>{setRole("decorator");setKiosko(true);setStep("person");}}>
         <span className="role-ic">🖥️</span>
         <div>
           <div className="role-name kiosko">Modo Kiosko — Taller</div>
           <div className="role-desc">Pantalla grande para la tablet del taller · Sin PIN de salida</div>
+        </div>
+      </button>
+      {/* Modo TV — televisor del área de producción */}
+      <button type="button" className="role-btn tv" onClick={()=>onSel("tv","TV")}>
+        <span className="role-ic">📺</span>
+        <div>
+          <div className="role-name tv">Modo TV — Producción</div>
+          <div className="role-desc">Panel general para el televisor · Todos los pedidos en tiempo real</div>
         </div>
       </button>
     </div>
@@ -462,6 +603,7 @@ function RoleSel({ onSel }) {
 ══════════════════════════════════════════════════ */
 function FloristeriaLizApp() {
   const [pinOk,     setPinOk]     = React.useState(sessionStorage.getItem("liz-pin-ok")==="1");
+  const [secPinOk,  setSecPinOk]  = React.useState(sessionStorage.getItem("liz-sec-ok")==="1");
   const [loading,   setLoading]   = React.useState(true);
   const [role,      setRole]      = React.useState(null);
   const [user,      setUser]      = React.useState(null);
@@ -517,6 +659,22 @@ function FloristeriaLizApp() {
   if(loading) return(<><style>{CSS}</style><div className="loader"><img src={LIZ_LOGO} className="loader-logo" onError={e=>e.target.style.display="none"} alt=""/><div className="loader-title">Floristería Liz</div><div className="spinner"/><div className="loader-sub">Conectando...</div></div></>);
   if(!role) return(<><style>{CSS}</style><RoleSel onSel={(r,n)=>{setRole(r);setUser(n);}}/></>);
 
+  /* ── MODO TV: sin PIN de secretaria, acceso directo ── */
+  if(role==="tv") return(
+    <><style>{CSS}</style>
+    <TVView orders={orders} onExit={()=>{setRole(null);setUser(null);}}/>
+    </>
+  );
+
+  /* ── SEGUNDA CAPA: PIN de Secretaria ── */
+  if(role==="secretary" && !secPinOk) return(
+    <><style>{CSS}</style>
+    <SecPINScreen
+      onSuccess={()=>setSecPinOk(true)}
+      onBack={()=>{ setRole(null); setUser(null); }}
+    /></>
+  );
+
   /* MEJORA 3: Modo Kiosko — pantalla especial */
   if(role==="kiosko") return(
     <><style>{CSS}</style>
@@ -539,7 +697,7 @@ function FloristeriaLizApp() {
           </div>
           <div className="hdr-right">
             <span className={"hdr-dot"+(connected?"":" off")} title={connected?"En línea":"Sin conexión"}/>
-            <button type="button" className="hdr-exit" onClick={()=>{setRole(null);setUser(null);setView("list");setSelOrd(null);}}>Salir</button>
+            <button type="button" className="hdr-exit" onClick={()=>{setRole(null);setUser(null);setView("list");setSelOrd(null);setSecPinOk(false);sessionStorage.removeItem("liz-sec-ok");}}>Salir</button>
           </div>
         </div>
       </header>
@@ -972,8 +1130,196 @@ function DriView({orders,user,onSel}){
 
 function EmptyState({text}){return(<div className="empty"><span className="empty-ic">🌿</span><div className="empty-txt">{text}</div></div>);}
 
+/* ══════════════════════════════════════════════════
+   📺 MODO TV — Panel general para el televisor del taller
+   • Reloj en tiempo real
+   • Todos los pedidos activos con colores por estado
+   • Paginación automática cada 8 segundos
+   • Alerta visual + sonido cuando entra pedido nuevo
+   • Barra de entregados hoy en la parte inferior
+══════════════════════════════════════════════════ */
+function TVCard({ o }) {
+  const [now, setNow] = React.useState(Date.now());
+  const cfg = SC[o.status] || SC.pendiente;
+
+  /* Timer en vivo — actualiza cada 30 seg */
+  React.useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const elapsed   = o.finishedAt ? o.finishedAt - o.createdAt : now - o.createdAt;
+  const timerLabel = o.finishedAt
+    ? "✓ Elaborado en " + formatTime(o.finishedAt - o.createdAt)
+    : "⏱ " + formatTime(elapsed) + " transcurridos";
+  const timerClass = o.finishedAt ? "done" : "running";
+
+  return (
+    <div className={"tv-card" + (o.urgente ? " tv-urg" : "") + " tv-" + o.status}>
+      <div className="tv-status-strip" style={{ background: cfg.dot }} />
+
+      <div className="tv-card-head">
+        <span className="tv-badge" style={{ color: cfg.color, background: cfg.bg }}>
+          <span style={{ width: ".6vw", height: ".6vw", borderRadius: "50%", background: cfg.dot, display: "inline-block", marginRight: ".3vw" }} />
+          {cfg.label}
+        </span>
+        {o.urgente && <span className="tv-urg-pill">⚡ URGENTE</span>}
+      </div>
+
+      <div className="tv-prod-name">{o.productName}</div>
+
+      <div className="tv-card-info">
+        <div className="tv-info-row">👤 <strong>{o.clientName}</strong></div>
+        <div className="tv-info-row">✂️ <strong>{o.decorator}</strong></div>
+        <div className="tv-info-row">⏰ <strong>{o.deliveryTime || "Flexible"}</strong></div>
+        <div className="tv-info-row">🛵 <strong>{o.deliveryPerson || "Por asignar"}</strong></div>
+      </div>
+
+      {o.notes && <div className="tv-note-tv">📝 "{o.notes}"</div>}
+
+      <div className={"tv-timer " + timerClass}>{timerLabel}</div>
+    </div>
+  );
+}
+
+function TVView({ orders, onExit }) {
+  const [now,      setNow]      = React.useState(new Date());
+  const [page,     setPage]     = React.useState(0);
+  const [alert,    setAlert]    = React.useState(null);
+  const prevLen = React.useRef(0);
+
+  /* Reloj — actualiza cada segundo */
+  React.useEffect(() => {
+    const iv = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  /* Pedidos activos (excluyendo entregados) ordenados por urgencia y estado */
+  const active = React.useMemo(() =>
+    orders
+      .filter(o => o.status !== "entregado" && isToday(o.createdAt))
+      .sort((a, b) => {
+        if (a.urgente && !b.urgente) return -1;
+        if (!a.urgente && b.urgente) return 1;
+        return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
+      }),
+    [orders]
+  );
+
+  /* Pedidos entregados hoy para la barra inferior */
+  const delivered = orders.filter(o => o.status === "entregado" && isToday(o.createdAt));
+
+  /* Estadísticas del día */
+  const stats = [
+    { key:"pendiente",     label:"Pendientes" },
+    { key:"en_produccion", label:"En taller" },
+    { key:"listo",         label:"Listos" },
+    { key:"en_camino",     label:"En ruta" },
+    { key:"entregado",     label:"Entregados" },
+  ].map(s => ({ ...s, ...SC[s.key], count: orders.filter(o => o.status === s.key && isToday(o.createdAt)).length }))
+   .filter(s => s.count > 0);
+
+  /* Paginación automática cada 8 segundos */
+  const PER_PAGE   = 6;
+  const totalPages = Math.max(1, Math.ceil(active.length / PER_PAGE));
+  const pageItems  = active.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+
+  React.useEffect(() => {
+    if (totalPages <= 1) { setPage(0); return; }
+    const iv = setInterval(() => setPage(p => (p + 1) % totalPages), 8000);
+    return () => clearInterval(iv);
+  }, [totalPages]);
+
+  /* Detectar pedido nuevo → alerta visual + sonido */
+  React.useEffect(() => {
+    if (prevLen.current > 0 && active.length > prevLen.current) {
+      const newest = active[0];
+      setAlert(newest);
+      playChime(newest?.urgente ? "alert" : "new");
+      setTimeout(() => setAlert(null), 4000);
+    }
+    prevLen.current = active.length;
+  }, [active.length]);
+
+  /* Reloj formateado */
+  const timeStr = now.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const dateStr = now.toLocaleDateString("es-CO",  { weekday: "long", day: "numeric", month: "long" });
+
+  /* Clase del grid según cantidad de cards */
+  const gridClass = "tv-g-" + Math.min(pageItems.length, 6);
+
+  return (
+    <div className="tv-wrap">
+      {alert && (
+        <div className="tv-new-alert">
+          🌸 NUEVO PEDIDO — {alert.productName}{alert.urgente ? " ⚡ URGENTE" : ""}
+        </div>
+      )}
+
+      {/* HEADER: logo + nombre + reloj */}
+      <div className="tv-hdr">
+        <div className="tv-brand">
+          <img src={LIZ_LOGO} className="tv-logo" onError={e => e.target.style.display="none"} alt="" />
+          <div>
+            <div className="tv-hdr-name">Floristería Liz — Panel de Producción</div>
+            <div className="tv-hdr-sub" style={{ textTransform:"capitalize" }}>{dateStr}</div>
+          </div>
+        </div>
+        <div className="tv-clock">{timeStr}</div>
+      </div>
+
+      {/* STATS + paginación */}
+      <div className="tv-stats-bar">
+        {stats.map(s => (
+          <div key={s.key} className="tv-stat-item">
+            <span className="tv-stat-dot" style={{ background: s.dot }} />
+            <span className="tv-stat-lbl">{s.label}</span>
+            <span className="tv-stat-n">{s.count}</span>
+          </div>
+        ))}
+        {totalPages > 1 && (
+          <div className="tv-pager">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <div key={i} className={"tv-pager-dot" + (i === page ? " on" : "")} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* GRID de pedidos */}
+      {active.length === 0 ? (
+        <div className="tv-empty">
+          <div className="tv-empty-ic">✅</div>
+          <div className="tv-empty-txt">Sin pedidos activos — ¡Todo al día!</div>
+        </div>
+      ) : (
+        <div className={"tv-grid " + gridClass}>
+          {pageItems.map(o => <TVCard key={o.id} o={o} />)}
+        </div>
+      )}
+
+      {/* BARRA inferior — entregados hoy */}
+      {delivered.length > 0 && (
+        <div className="tv-done-bar">
+          <span className="tv-done-lbl">✅ Entregados hoy: {delivered.length}</span>
+          {delivered.slice(0, 6).map(o => (
+            <span key={o.id} className="tv-done-item">
+              {o.productName} → 🛵 {o.deliveryPerson || "—"}
+              {o.finishedAt && <span style={{ marginLeft: ".4vw", color: "#22c55e" }}>({formatTime(o.finishedAt - o.createdAt)})</span>}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Botón salir — muy discreto, esquina inferior derecha */}
+      <button type="button" className="tv-exit-btn" onClick={onExit}>✕ Salir TV</button>
+    </div>
+  );
+}
+
 const root=ReactDOM.createRoot(document.getElementById("root"));
 root.render(<FloristeriaLizApp/>);
+
 </script>
 </body>
 </html>
